@@ -101,7 +101,8 @@ class GoogleAssistant {
     }
 }
 
-const homedir = require('homedir')
+// Only useful for running standalone sample, creates confusing file requirement
+/*const homedir = require('homedir')
 const deviceCredentials = require(`${homedir()}/.config/google-oauthlib-tool/credentials.json`);
 
 const CREDENTIALS = {
@@ -124,5 +125,5 @@ const promptUser = () => {
     });
 };
 
-promptUser();
+promptUser();*/
 module.exports = GoogleAssistant;
