@@ -27,6 +27,11 @@ const embedded_assistant_pb = grpc.load({
     file: path.relative(PROTO_ROOT_DIR, protoFiles.embeddedAssistant.v1alpha2)
 }).google.assistant.embedded.v1alpha2;
 
+const coord_pb = grpc.load({
+    root: PROTO_ROOT_DIR,
+    file: 'google/type/latlng.proto'
+}).google.type;
+
 class GoogleAssistant {
     constructor(credentials) {
         GoogleAssistant.prototype.endpoint_ = "embeddedassistant.googleapis.com";
@@ -47,7 +52,7 @@ class GoogleAssistant {
         return client;
     }
 
-    assist(input) {
+    assist(input, lat = undefined, long = undefined) {
         const config = new embedded_assistant_pb.AssistConfig();
         config.setTextQuery(input);
         config.setAudioOutConfig(new embedded_assistant_pb.AudioOutConfig());
@@ -57,6 +62,16 @@ class GoogleAssistant {
         config.setDialogStateIn(new embedded_assistant_pb.DialogStateIn());
         config.setDeviceConfig(new embedded_assistant_pb.DeviceConfig());
         config.getDialogStateIn().setLanguageCode(this.locale);
+        config.getDialogStateIn().setDeviceLocation(new embedded_assistant_pb.DeviceLocation());
+        const loc = new coord_pb.LatLng();
+        if (lat !== undefined && long !== undefined) {
+            loc.setLatitude(lat);
+            loc.setLongitude(long);
+        } else {
+            loc.setLatitude(1);
+            loc.setLongitude(1);
+        }
+        config.getDialogStateIn().getDeviceLocation().setCoordinates(loc);
         config.getDeviceConfig().setDeviceId(this.deviceInstanceId);
         config.getDeviceConfig().setDeviceModelId(this.deviceModelId);
         const request = new embedded_assistant_pb.AssistRequest();
